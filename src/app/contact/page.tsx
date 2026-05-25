@@ -1,23 +1,48 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, AlertCircle } from 'lucide-react';
 import { FadeIn } from '@/components/ui/FadeIn';
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer';
+import { TurnstileWidget } from '@/components/ui/TurnstileWidget';
+import { submitContactAction } from '@/actions/contact';
 
 export default function ContactPage() {
-  const [sent, setSent] = useState(false);
+  const [sent,    setSent]    = useState(false);
   const [sending, setSending] = useState(false);
+  const [error,   setError]   = useState('');
+  const turnstileTokenRef = useRef('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
+
+    if (!turnstileTokenRef.current && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+      setError('Please complete the CAPTCHA verification.');
+      return;
+    }
+
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+
+    const formData = new FormData(e.currentTarget);
+    const result = await submitContactAction({
+      firstName: formData.get('firstName') as string,
+      lastName:  formData.get('lastName')  as string,
+      email:     formData.get('email')     as string,
+      subject:   formData.get('subject')   as string,
+      message:   formData.get('message')   as string,
+      turnstileToken: turnstileTokenRef.current || 'dev-bypass',
+    });
+
+    setSending(false);
+
+    if (result.success) {
       setSent(true);
       setTimeout(() => setSent(false), 3000);
-    }, 1200);
+    } else {
+      setError(result.error ?? 'Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -118,13 +143,18 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold mb-8">Send us a Message</h2>
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['First Name', 'Last Name'].map((label, i) => (
-                    <div key={label}>
-                      <label className="block text-sm font-bold mb-2">{label}</label>
+                  {[
+                    { label: 'First Name', name: 'firstName', placeholder: 'John' },
+                    { label: 'Last Name',  name: 'lastName',  placeholder: 'Doe'  },
+                  ].map((f) => (
+                    <div key={f.label}>
+                      <label className="block text-sm font-bold mb-2">{f.label}</label>
                       <input
+                        required
                         type="text"
+                        name={f.name}
+                        placeholder={f.placeholder}
                         className="w-full px-6 py-4 bg-muted/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary outline-none transition-all"
-                        placeholder={i === 0 ? 'John' : 'Doe'}
                       />
                     </div>
                   ))}
@@ -133,7 +163,9 @@ export default function ContactPage() {
                 <div>
                   <label className="block text-sm font-bold mb-2">Email Address</label>
                   <input
+                    required
                     type="email"
+                    name="email"
                     className="w-full px-6 py-4 bg-muted/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary outline-none transition-all"
                     placeholder="john@example.com"
                   />
@@ -141,7 +173,10 @@ export default function ContactPage() {
 
                 <div>
                   <label className="block text-sm font-bold mb-2">Subject</label>
-                  <select className="w-full px-6 py-4 bg-muted/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary outline-none transition-all">
+                  <select
+                    name="subject"
+                    className="w-full px-6 py-4 bg-muted/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary outline-none transition-all"
+                  >
                     <option>General Inquiry</option>
                     <option>Product Specification</option>
                     <option>Project Partnership</option>
@@ -152,11 +187,25 @@ export default function ContactPage() {
                 <div>
                   <label className="block text-sm font-bold mb-2">Message</label>
                   <textarea
+                    required
+                    name="message"
                     rows={5}
                     className="w-full px-6 py-4 bg-muted/50 border border-border rounded-2xl focus:ring-2 focus:ring-primary outline-none resize-none transition-all"
                     placeholder="How can we help you today?"
                   />
                 </div>
+
+                <TurnstileWidget
+                  onVerify={(token) => { turnstileTokenRef.current = token; }}
+                  onExpire={() => { turnstileTokenRef.current = ''; }}
+                />
+
+                {error && (
+                  <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl px-4 py-3">
+                    <AlertCircle size={16} className="shrink-0" />
+                    {error}
+                  </div>
+                )}
 
                 <motion.button
                   whileHover={!sending ? { scale: 1.02, boxShadow: '0 12px 40px -8px rgba(59,130,246,0.4)' } : {}}

@@ -1,26 +1,56 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, ArrowLeft, Send, CheckCircle2, ShoppingBag } from 'lucide-react';
+import { Trash2, ArrowLeft, Send, CheckCircle2, ShoppingBag, AlertCircle } from 'lucide-react';
 import { useQuote } from '@/context/QuoteContext';
 import { cn } from '@/lib/utils';
 import { FadeIn } from '@/components/ui/FadeIn';
+import { TurnstileWidget } from '@/components/ui/TurnstileWidget';
+import { submitQuoteAction } from '@/actions/quote';
 
 export default function QuotePage() {
   const { items, removeItem, updateQuantity, clearCart, itemCount } = useQuote();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading,   setIsLoading]   = useState(false);
+  const [error,       setError]       = useState('');
+  const turnstileTokenRef = useRef('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
+
+    if (!turnstileTokenRef.current && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+      setError('Please complete the CAPTCHA verification.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+
+    const formData = new FormData(e.currentTarget);
+    const result = await submitQuoteAction({
+      customerName: formData.get('fullName')    as string,
+      companyName:  formData.get('companyName') as string,
+      email:        formData.get('email')       as string,
+      phone:        formData.get('phone')       as string,
+      message:      formData.get('message')     as string ?? '',
+      items: items.map((item) => ({
+        productId:   item.id,
+        productName: item.name,
+        quantity:    item.quantity,
+      })),
+      turnstileToken: turnstileTokenRef.current || 'dev-bypass',
+    });
+
+    setIsLoading(false);
+
+    if (result.success) {
       setIsSubmitted(true);
       clearCart();
-    }, 1500);
+    } else {
+      setError(result.error ?? 'Something went wrong. Please try again.');
+    }
   };
 
   if (isSubmitted) {
@@ -211,15 +241,16 @@ export default function QuotePage() {
               <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 {[
-                  { label: 'Full Name', type: 'text', placeholder: 'John Doe' },
-                  { label: 'Company Name', type: 'text', placeholder: 'Acme Construction' },
-                  { label: 'Email Address', type: 'email', placeholder: 'john@company.com' },
-                  { label: 'Phone Number', type: 'tel', placeholder: '+91 00000 00000' },
+                  { label: 'Full Name',     name: 'fullName',    type: 'text',  placeholder: 'John Doe' },
+                  { label: 'Company Name',  name: 'companyName', type: 'text',  placeholder: 'Acme Construction' },
+                  { label: 'Email Address', name: 'email',       type: 'email', placeholder: 'john@company.com' },
+                  { label: 'Phone Number',  name: 'phone',       type: 'tel',   placeholder: '+91 00000 00000' },
                 ].map((field) => (
                   <div key={field.label}>
                     <label className="block text-sm font-bold mb-2">{field.label}</label>
                     <input
-                      required
+                      required={field.name !== 'companyName'}
+                      name={field.name}
                       type={field.type}
                       className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all"
                       placeholder={field.placeholder}
@@ -229,11 +260,24 @@ export default function QuotePage() {
                 <div>
                   <label className="block text-sm font-bold mb-2">Project Details (Optional)</label>
                   <textarea
+                    name="message"
                     rows={3}
                     className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none transition-all"
                     placeholder="Tell us about your project requirements..."
                   />
                 </div>
+
+                <TurnstileWidget
+                  onVerify={(token) => { turnstileTokenRef.current = token; }}
+                  onExpire={() => { turnstileTokenRef.current = ''; }}
+                />
+
+                {error && (
+                  <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
+                    <AlertCircle size={16} className="shrink-0" />
+                    {error}
+                  </div>
+                )}
 
                 <motion.button
                   whileHover={!isLoading ? { scale: 1.02, boxShadow: '0 12px 40px -8px rgba(249,115,22,0.4)' } : {}}

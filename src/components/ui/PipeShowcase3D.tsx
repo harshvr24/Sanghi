@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import {
   Environment,
@@ -348,7 +348,11 @@ function Scene({ scrollProgress }: { scrollProgress: MotionValue<number> }) {
       <Sparkles count={100} scale={14} size={3} speed={0.4} opacity={0.28} color="#60a5fa" />
       <Sparkles count={50} scale={20} size={1.5} speed={0.25} opacity={0.1} color="#ffffff" />
 
-      <Environment preset="city" />
+      {/* Inner Suspense so the HDR download never blocks the outer page.tsx Suspense boundary.
+          The canvas renders immediately; env map layers in once the network fetch completes. */}
+      <Suspense fallback={null}>
+        <Environment preset="city" />
+      </Suspense>
       <ContactShadows position={[0, -4.5, 0]} opacity={0.4} scale={30} blur={2.5} far={6} />
 
       {/* Background pillar grid */}
@@ -407,10 +411,10 @@ export const PipeShowcase3D = () => {
         {/* Scroll-driven text overlays */}
         <div className="absolute inset-0 pointer-events-none">
 
-          {/* 1 — Hero (visible from the very first frame, sits at top so pipe is visible below) */}
+          {/* 1 — Hero: visible from the start, fades slowly and is fully gone by 18% (when DI Pipe section starts) */}
           <TextSection
             scrollProgress={scrollYProgress}
-            inStart={0} peakStart={0.001} peakEnd={0.17} outEnd={0.24}
+            inStart={0} peakStart={0.001} peakEnd={0.001} outEnd={0.18}
             align="center"
             verticalAlign="top"
             startVisible
@@ -476,10 +480,10 @@ export const PipeShowcase3D = () => {
             </div>
           </TextSection>
 
-          {/* 3 — Internal analysis panel */}
+          {/* 3 — Internal analysis panel: stays fully visible through pipe reassembly */}
           <TextSection
             scrollProgress={scrollYProgress}
-            inStart={0.44} peakStart={0.50} peakEnd={0.67} outEnd={0.74}
+            inStart={0.44} peakStart={0.50} peakEnd={0.74} outEnd={0.88}
             align="right"
           >
             <div className="max-w-sm bg-slate-950/85 backdrop-blur-2xl p-8 rounded-[2rem] border border-white/[0.08] shadow-2xl relative">
@@ -534,10 +538,10 @@ export const PipeShowcase3D = () => {
             </div>
           </TextSection>
 
-          {/* 4 — Final stats */}
+          {/* 4 — Final stats: starts after section 3 fades, no overlap with section 1 */}
           <TextSection
             scrollProgress={scrollYProgress}
-            inStart={0.73} peakStart={0.79} peakEnd={0.97} outEnd={1.0}
+            inStart={0.83} peakStart={0.90} peakEnd={0.97} outEnd={1.0}
             align="center"
           >
             <div className="text-center">

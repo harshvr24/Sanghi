@@ -32,20 +32,30 @@ export default function ProductsPage() {
     setTimeout(() => setAddedId(null), 2000);
   };
 
-  const getProductModelProps = (category: string) => {
-    switch (category) {
-      case 'Ductile Iron Pipes':
-        return { type: 'pipe', color: '#1a1a1a', metalness: 0.9, roughness: 0.4 };
-      case 'Cast Iron Pipes':
-        return { type: 'pipe', color: '#262626', metalness: 0.8, roughness: 0.6 };
-      case 'Valves':
-        return { type: 'valve', color: '#1e40af', metalness: 1, roughness: 0.2 };
-      case 'DI Fittings':
-      case 'CI Fittings':
-        return { type: 'fitting', color: '#4b5563', metalness: 0.9, roughness: 0.3 };
-      default:
-        return { type: 'pipe', color: '#cbd5e1', metalness: 1, roughness: 0.1 };
-    }
+  const getProductModelProps = (product: Product) => {
+    const map: Record<string, { type: string; color: string; metalness: number; roughness: number }> = {
+      'di-double-flange-pipe':  { type: 'flanged-pipe',    color: '#1a2535', metalness: 0.95, roughness: 0.28 },
+      'di-spun-pipe-ss':        { type: 'ss-pipe',         color: '#1a2535', metalness: 0.95, roughness: 0.28 },
+      'ci-double-flange-pipe':  { type: 'flanged-pipe',    color: '#2d2d2d', metalness: 0.72, roughness: 0.65 },
+      'ci-spun-pipe-ss':        { type: 'ss-pipe',         color: '#2d2d2d', metalness: 0.72, roughness: 0.65 },
+      'sluice-valve':           { type: 'gate-valve',      color: '#1e3a5f', metalness: 0.92, roughness: 0.22 },
+      'air-valve':              { type: 'air-valve',       color: '#374151', metalness: 0.85, roughness: 0.35 },
+      'butterfly-valve':        { type: 'butterfly-valve', color: '#1e3a5f', metalness: 0.92, roughness: 0.2  },
+      'non-return-valve':       { type: 'check-valve',     color: '#1e3a5f', metalness: 0.92, roughness: 0.28 },
+      'di-specials':            { type: 'pipe-elbow',      color: '#1a2535', metalness: 0.95, roughness: 0.28 },
+      'hdpe-pipes':             { type: 'hdpe-pipe',       color: '#0f172a', metalness: 0,    roughness: 0.75 },
+      'hdpe-specials':          { type: 'pipe-elbow',      color: '#0f172a', metalness: 0,    roughness: 0.75 },
+      'electrofusion-fittings': { type: 'ef-coupler',      color: '#0f172a', metalness: 0,    roughness: 0.7  },
+      'dwc-pipes':              { type: 'dwc-pipe',        color: '#111827', metalness: 0,    roughness: 0.8  },
+      'opvc-pipes-fittings':    { type: 'opvc-pipe',       color: '#cbd5e1', metalness: 0,    roughness: 0.6  },
+      'ms-pipes':               { type: 'ss-pipe',         color: '#4b5563', metalness: 0.82, roughness: 0.5  },
+      'ms-specials':            { type: 'pipe-elbow',      color: '#4b5563', metalness: 0.82, roughness: 0.5  },
+      'gi-pipes':               { type: 'gi-pipe',         color: '#9ca3af', metalness: 0.97, roughness: 0.12 },
+      'gi-specials':            { type: 'pipe-elbow',      color: '#9ca3af', metalness: 0.95, roughness: 0.15 },
+      'tmt-bars':               { type: 'tmt-bar',         color: '#374151', metalness: 0.85, roughness: 0.55 },
+      'ms-bolts-nut-bolts':     { type: 'bolt',            color: '#9ca3af', metalness: 0.97, roughness: 0.12 },
+    };
+    return map[product.id] ?? { type: 'ss-pipe', color: '#cbd5e1', metalness: 1, roughness: 0.1 };
   };
 
   return (
@@ -64,7 +74,7 @@ export default function ProductsPage() {
         {/* Filters */}
         <FadeIn delay={0.2}>
           <div className="flex flex-col lg:flex-row gap-6 mb-16">
-            <div className="relative flex-grow">
+            <div className="relative flex-grow lg:self-start">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
               <input
                 type="text"
@@ -122,7 +132,7 @@ export default function ProductsPage() {
                 )}
               >
                 <div className="aspect-[4/3] relative bg-gradient-to-br from-slate-900 to-black overflow-hidden">
-                  <InteractiveProductModel {...getProductModelProps(product.category)} />
+                  <InteractiveProductModel {...getProductModelProps(product)} />
                   <div className="absolute top-6 right-6">
                     <span className="bg-white/5 backdrop-blur-md text-white/40 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full border border-white/10">
                       {product.category}

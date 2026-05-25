@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -21,21 +22,26 @@ export const metadata: Metadata = {
   description: "Sanghi Tubes Private Limited - Manufacturer and supplier of Ductile Iron Pipes, Cast Iron Pipes, Fittings, and Valves in Kanpur, India.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  // The middleware sets x-pathname so we can detect admin routes server-side.
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isAdmin  = pathname.startsWith("/admin");
+
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <QuoteProvider>
-          <ScrollProgress />
-          <Navbar />
+          {!isAdmin && <ScrollProgress />}
+          {!isAdmin && <Navbar />}
           <main className="flex-grow">
             {children}
           </main>
-          <Footer />
+          {!isAdmin && <Footer />}
         </QuoteProvider>
       </body>
     </html>
