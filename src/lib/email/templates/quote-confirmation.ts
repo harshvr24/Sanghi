@@ -1,3 +1,5 @@
+import { SPT_LOGO_DATA_URI } from '../logo'
+
 interface QuoteConfirmationData {
   customerName: string
   items: Array<{ productName: string; quantity: number }>
@@ -25,6 +27,17 @@ export function quoteConfirmationHtml(data: QuoteConfirmationData): string {
   <!-- Header -->
   <tr>
     <td style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:40px;">
+      <table cellpadding="0" cellspacing="0" style="margin-bottom:18px;">
+        <tr>
+          <td style="vertical-align:middle;padding-right:14px;">
+            <img src="${SPT_LOGO_DATA_URI}" alt="SPT" width="56" height="56" style="display:block;border-radius:8px;background:#fff;" />
+          </td>
+          <td style="vertical-align:middle;">
+            <div style="color:#ffffff;font-size:20px;font-weight:900;letter-spacing:-0.03em;line-height:1.1;">SANGHI</div>
+            <div style="color:#bfdbfe;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Pipes &amp; Tubes</div>
+          </td>
+        </tr>
+      </table>
       <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">Quote Request Received</h1>
       <p style="margin:8px 0 0;color:#bfdbfe;font-size:15px;">Thank you for choosing Sanghi Pipes &amp; Tubes</p>
     </td>

@@ -58,7 +58,7 @@ export const Footer = () => {
       >
         {/* Brand Column */}
         <motion.div variants={colVariants} className="space-y-6">
-          <Logo className="brightness-0 invert" />
+          <Logo />
           <p className="text-sm leading-relaxed text-slate-400">
             M/s Sanghi Pipes & Tubes is a reputed supplier and manufacturer of Cast Iron / Ductile Iron
             Spun Pipes, Fittings and Valves. We are committed to excellence and quality in infrastructure

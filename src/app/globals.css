@@ -62,26 +62,38 @@
   :root {
     --background: #020617;
     --foreground: #f8fafc;
-    
     --primary: #3b82f6;
     --primary-foreground: #ffffff;
-    
     --secondary: #fb923c;
     --secondary-foreground: #0f172a;
-    
     --accent: #1e40af;
     --accent-foreground: #ffffff;
-    
     --muted: #1e293b;
     --muted-foreground: #94a3b8;
-    
     --card: #0f172a;
     --card-foreground: #f8fafc;
-    
     --border: #1e293b;
     --input: #1e293b;
     --ring: #3b82f6;
   }
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #fb923c;
+  --secondary-foreground: #0f172a;
+  --accent: #1e40af;
+  --accent-foreground: #ffffff;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #3b82f6;
 }
 
 body {
@@ -104,4 +116,14 @@ body {
 .dark .glass {
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes product-spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
+@keyframes product-float {
+  from { transform: translateY(0px); }
+  to   { transform: translateY(-10px); }
 }

@@ -33,7 +33,7 @@ export default async function RootLayout({
   const isAdmin  = pathname.startsWith("/admin");
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <QuoteProvider>
           {!isAdmin && <ScrollProgress />}

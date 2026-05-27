@@ -1,3 +1,5 @@
+import { SPT_LOGO_DATA_URI } from '../logo'
+
 interface QuoteNotificationData {
   quoteId: string
   customerName: string
@@ -32,6 +34,17 @@ export function quoteNotificationHtml(data: QuoteNotificationData): string {
   <!-- Header -->
   <tr>
     <td style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:32px 40px;">
+      <table cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+        <tr>
+          <td style="vertical-align:middle;padding-right:14px;">
+            <img src="${SPT_LOGO_DATA_URI}" alt="SPT" width="52" height="52" style="display:block;border-radius:8px;background:#fff;" />
+          </td>
+          <td style="vertical-align:middle;">
+            <div style="color:#ffffff;font-size:18px;font-weight:900;letter-spacing:-0.03em;line-height:1.1;">SANGHI</div>
+            <div style="color:#bfdbfe;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Pipes &amp; Tubes</div>
+          </td>
+        </tr>
+      </table>
       <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;">New Quote Request</h1>
       <p style="margin:6px 0 0;color:#bfdbfe;font-size:14px;">Submitted via Sanghi Pipes &amp; Tubes website</p>
     </td>

@@ -10,6 +10,14 @@ import { FadeIn } from '@/components/ui/FadeIn';
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer';
 import { PipeShowcase3D } from '@/components/ui/PipeShowcase3D';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
+import { InteractiveProductModel } from '@/components/ui/InteractiveProductModel';
+
+const featuredProductModelMap: Record<string, { type: string; color: string; metalness: number; roughness: number }> = {
+  'di-double-flange-pipe':  { type: 'flanged-pipe', color: '#1a2535', metalness: 0.95, roughness: 0.28 },
+  'di-spun-pipe-ss':        { type: 'ss-pipe',      color: '#1a2535', metalness: 0.95, roughness: 0.28 },
+  'ci-double-flange-pipe':  { type: 'flanged-pipe', color: '#2d2d2d', metalness: 0.72, roughness: 0.65 },
+  'ci-spun-pipe-ss':        { type: 'ss-pipe',      color: '#2d2d2d', metalness: 0.72, roughness: 0.65 },
+};
 
 export default function Home() {
   const featuredProducts = products.slice(0, 4);
@@ -119,6 +127,7 @@ export default function Home() {
                       src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800"
                       alt={cat}
                       fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
                     />
                   </motion.div>
@@ -195,6 +204,7 @@ export default function Home() {
                   src="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&q=80"
                   alt="Factory"
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                 />
               </motion.div>
@@ -272,43 +282,51 @@ export default function Home() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 flex-1 min-h-0">
                 {[
                   {
-                    icon: <Layers size={16} />,
+                    Icon: Layers,
                     cat: 'Ductile Iron Pipes',
                     spec: 'DN 80 – 1200 mm',
-                    skus: '15+ SKUs',
+                    skus: '15+',
                     fill: 78,
                     gradient: 'from-blue-900/40 to-slate-900/0',
                     accent: 'text-blue-400',
+                    accentBg: 'bg-blue-400/10',
+                    accentGlow: 'rgba(59,130,246,0.4)',
                     bar: 'bg-blue-500',
                   },
                   {
-                    icon: <GitBranch size={16} />,
+                    Icon: GitBranch,
                     cat: 'Cast Iron Pipes',
                     spec: 'Class LA – D',
-                    skus: '12+ SKUs',
+                    skus: '12+',
                     fill: 62,
                     gradient: 'from-slate-800/60 to-slate-900/0',
                     accent: 'text-slate-300',
+                    accentBg: 'bg-slate-300/10',
+                    accentGlow: 'rgba(203,213,225,0.3)',
                     bar: 'bg-slate-400',
                   },
                   {
-                    icon: <Wrench size={16} />,
+                    Icon: Wrench,
                     cat: 'DI Fittings',
                     spec: 'K9 / K7 Grade',
-                    skus: '20+ SKUs',
+                    skus: '20+',
                     fill: 88,
                     gradient: 'from-indigo-900/40 to-slate-900/0',
                     accent: 'text-indigo-400',
+                    accentBg: 'bg-indigo-400/10',
+                    accentGlow: 'rgba(129,140,248,0.4)',
                     bar: 'bg-indigo-500',
                   },
                   {
-                    icon: <Gauge size={16} />,
+                    Icon: Gauge,
                     cat: 'Industrial Valves',
                     spec: 'PN 10 – PN 25',
-                    skus: '8+ SKUs',
+                    skus: '8+',
                     fill: 55,
                     gradient: 'from-violet-900/30 to-slate-900/0',
                     accent: 'text-violet-400',
+                    accentBg: 'bg-violet-400/10',
+                    accentGlow: 'rgba(167,139,250,0.4)',
                     bar: 'bg-violet-500',
                   },
                 ].map((item, i) => (
@@ -319,23 +337,42 @@ export default function Home() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.35 + i * 0.07, duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                     whileHover={{ scale: 1.03, borderColor: 'rgba(59,130,246,0.3)' }}
-                    className={`rounded-xl md:rounded-2xl p-3 md:p-4 bg-gradient-to-br ${item.gradient}
-                                border border-white/5 flex flex-col justify-between
+                    className={`rounded-xl md:rounded-2xl bg-gradient-to-br ${item.gradient}
+                                border border-white/5 flex flex-col
                                 transition-colors cursor-default overflow-hidden relative`}
                   >
                     <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 bg-primary/5 pointer-events-none" />
-                    <div className="relative z-10">
-                      <div className={`${item.accent} mb-2 opacity-70`}>{item.icon}</div>
-                      <div className="text-[9px] text-primary font-black uppercase tracking-[0.2em] mb-1.5">
-                        {item.skus}
+
+                    {/* Top: icon + SKU label + category name */}
+                    <div className="relative z-10 p-3 md:p-4">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <item.Icon size={12} className={`${item.accent} opacity-70`} />
+                        <span className="text-[9px] text-primary font-black uppercase tracking-[0.2em]">
+                          {item.skus} SKUs
+                        </span>
                       </div>
                       <h4 className="text-white font-bold text-xs md:text-sm leading-tight">
                         {item.cat}
                       </h4>
                     </div>
-                    <div className="relative z-10 mt-3">
-                      <div className="text-[9px] md:text-[10px] text-slate-500 font-mono">{item.spec}</div>
-                      <div className="mt-1.5 h-0.5 bg-white/5 rounded-full overflow-hidden">
+
+                    {/* Center: large glowing icon */}
+                    <div className="relative z-10 flex-1 flex items-center justify-center py-2">
+                      <div
+                        className={`p-4 md:p-5 rounded-2xl ${item.accentBg} border border-white/5`}
+                        style={{ filter: `drop-shadow(0 0 18px ${item.accentGlow})` }}
+                      >
+                        <item.Icon size={32} className={item.accent} />
+                      </div>
+                    </div>
+
+                    {/* Bottom: spec + fill bar */}
+                    <div className="relative z-10 p-3 md:p-4">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[9px] md:text-[10px] text-slate-500 font-mono">{item.spec}</span>
+                        <span className="text-[9px] text-slate-500 font-black">{item.fill}%</span>
+                      </div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           whileInView={{ width: `${item.fill}%` }}
@@ -401,11 +438,11 @@ export default function Home() {
                   whileHover={{ y: -15 }}
                   className="bg-slate-900/50 border border-white/5 rounded-[2.5rem] p-8 shadow-2xl hover:border-primary/30 transition-all h-full flex flex-col group"
                 >
-                  <div className="aspect-square bg-slate-950 rounded-[2rem] mb-8 overflow-hidden flex items-center justify-center relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="text-slate-800 font-black text-6xl italic -rotate-12 select-none group-hover:text-primary/20 transition-colors">
-                      PIPE
-                    </div>
+                  <div className="aspect-square bg-slate-950 rounded-[2rem] mb-8 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none" />
+                    <InteractiveProductModel
+                      {...(featuredProductModelMap[product.id] ?? { type: 'ss-pipe', color: '#cbd5e1', metalness: 1, roughness: 0.1 })}
+                    />
                   </div>
                   <div className="text-[10px] font-black text-primary mb-2 uppercase tracking-[0.2em]">{product.category}</div>
                   <h3 className="font-black text-xl mb-6 text-white uppercase italic tracking-tight">{product.name}</h3>

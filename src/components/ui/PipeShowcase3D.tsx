@@ -414,7 +414,7 @@ export const PipeShowcase3D = () => {
           {/* 1 — Hero: visible from the start, fades slowly and is fully gone by 18% (when DI Pipe section starts) */}
           <TextSection
             scrollProgress={scrollYProgress}
-            inStart={0} peakStart={0.001} peakEnd={0.001} outEnd={0.18}
+            inStart={0} peakStart={0.001} peakEnd={0.04} outEnd={0.15}
             align="center"
             verticalAlign="top"
             startVisible
